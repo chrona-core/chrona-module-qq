@@ -7,6 +7,7 @@ import { createChronaQqDelivery, createQqBotHandler, createQqBotState, parseAppr
 import { ackQqInteraction, createQqGateway, createQqTokenSource, downloadQqAttachment, sendQqC2c, uploadQqImage, validateQqFormat, type QqLog } from "./official";
 import { createRelay } from "./relay";
 import { createQqConversations } from "./conversations";
+import { createChatSync } from "./chat-sync";
 import { uiSettings } from "./ui-settings";
 import { SETTINGS_PAGE } from "./page";
 
@@ -174,7 +175,15 @@ if (!appId) {
   const tokens = createQqTokenSource({ appId, readSecret: async () => (await credentials()).clientSecret!, log });
   const state = createQqBotState(chrona.paths.data, appId);
   conversationBinding = () => state.binding();
-  pollConversations = async () => { await conversations.poll(); };
+  const mirror = createChatSync(chrona.paths.data, input => applicationCall('chat.qq-sync', {input}));
+  await mirror.initialize();
+  pollConversations = async () => {
+    await conversations.poll();
+    const binding = await state.binding();
+    if (!binding) return;
+    const ownerKey = `qq:dm:${createHash('sha256').update(binding.openid).digest('hex')}`;
+    await mirror.sync(binding.openid, (await conversations.app.list()).filter(s => s.key === ownerKey), id => conversations.app.messages(id));
+  };
   const relay = createRelay({ conversations, call: (target, args) => applicationCall(target, args), notify: args => chrona.call({ moduleId: chrona.dependencies["notify"]!, tool: "send" }, args, { mode: "async", key: `final:${String(args.key)}` }),
     publicUrl: process.env.CHRONA_PUBLIC_URL ?? null, download: downloadQqAttachment });
   let recipients = new Set<string>(), ready: boolean | null = null;

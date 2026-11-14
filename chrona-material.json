@@ -23,14 +23,18 @@
     "settings.bun.test.ts",
     "test.ts",
     "ui-settings.ts",
-    "unconfigured-harness.ts"
+    "unconfigured-harness.ts",
+    "chat-sync.ts",
+    "chat-sync-test.ts",
+    ".gitignore",
+    "CHAT-SYNC.md"
   ],
   "artifacts": [],
   "build": {
     "commands": [
-      "bun install --frozen-lockfile --ignore-scripts --no-progress"
+      "bun install --frozen-lockfile"
     ],
-    "toolchain": "Bun 1.4.2; Git exact 9adea757a3c6d3830783f46fcdd0e8a37062080b",
-    "target": "ordinary Chrona module; upstream identity separate from kernel candidate"
+    "toolchain": "Bun 1.4.2; host Chrona SDK",
+    "target": "linux x64 Chrona module"
   }
 }
