@@ -1,14 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Offline author test: drives the untyped fake kernel and fetch stubs. */
 import { strict as assert } from "node:assert";
-import { mkdir, readFile, rename, rmdir, symlink, unlink, writeFile, truncate } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, readFile, rename, rmdir, symlink, unlink, writeFile, truncate } from "node:fs/promises";
 import { join } from "node:path";
 // @ts-expect-error Chrona supplies the test kernel at run time.
-import { startModule, paths } from "chrona/testing";
+import { startModule, paths as hostPaths } from "chrona/testing";
 import { createQqBotState, createQqBotHandler, createQqPassiveReplies, parseApprovalDecision } from "./bot";
 import { createRelay } from "./relay";
 import { createQqConversations } from "./conversations";
 import { parseC2cEvent, downloadQqAttachment } from "./official";
 
+// Continuity checks run on a copy of real application data. Never treat its
+// first conversation, replay IDs or binding as our fixture, or mutate its files.
+await mkdir(hostPaths.data, { recursive: true });
+const fixture = await mkdtemp(join(hostPaths.data, "qq-regression-"));
+const paths = { data: join(fixture, "data"), content: join(fixture, "content") };
+await mkdir(paths.data, { recursive: true }); await mkdir(paths.content, { recursive: true });
+const previousData = process.env.CHRONA_DATA, previousContent = process.env.CHRONA_CONTENT;
+process.env.CHRONA_DATA = paths.data; process.env.CHRONA_CONTENT = paths.content;
+try {
 const now = new Date("2026-10-25T14:00:00Z"), appId = "123456";
 const state = createQqBotState(paths.data, appId);
 const challenge = await state.createChallenge({ workspaceId: "workspace", now });
@@ -118,6 +127,11 @@ try {
   assert.equal(mod.calls.filter((c: { params: { target?: unknown } }) => String(targetName(c.params.target)).startsWith("chat.")).length, 0);
 } finally { await mod.stop(); }
 console.log("binding, authorization, replay, approval, images, relay and entry integration passed");
+} finally {
+  if (previousData === undefined) delete process.env.CHRONA_DATA; else process.env.CHRONA_DATA = previousData;
+  if (previousContent === undefined) delete process.env.CHRONA_CONTENT; else process.env.CHRONA_CONTENT = previousContent;
+  await rm(fixture, { recursive: true, force: true });
+}
 
 function targetName(raw: unknown): string {
   if (typeof raw === "string") return raw;

@@ -34,7 +34,7 @@
     "commands": [
       "bun install --frozen-lockfile"
     ],
-    "toolchain": "Bun 1.4.2; host Chrona SDK",
+    "toolchain": "Bun 1.4.2; current host Chrona SDK",
     "target": "linux x64 Chrona module"
   }
 }
