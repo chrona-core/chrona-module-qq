@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "source": [
+    "LICENSE",
+    "agent-conversations.ts",
+    "approval-test.ts",
+    "bot.ts",
+    "bun.lock",
+    "conversations.ts",
+    "delivery.ts",
+    "format-test.ts",
+    "index.ts",
+    "kernel-client.ts",
+    "memory.ts",
+    "module.json",
+    "official.ts",
+    "offline-harness.ts",
+    "package.json",
+    "page.ts",
+    "preferences.ts",
+    "regression-test.ts",
+    "relay.ts",
+    "settings.bun.test.ts",
+    "test.ts",
+    "ui-settings.ts",
+    "unconfigured-harness.ts",
+    "chat-sync.ts",
+    "chat-sync-test.ts",
+    ".gitignore",
+    "CHAT-SYNC.md"
+  ],
+  "artifacts": [],
+  "build": {
+    "commands": [
+      "bun install --frozen-lockfile"
+    ],
+    "toolchain": "Bun 1.4.2; current host Chrona SDK",
+    "target": "linux x64 Chrona module"
+  }
+}

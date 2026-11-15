@@ -20,7 +20,8 @@
     "approvals.resolve",
     "notify.channel",
     "notify.send",
-    "web.page-set"
+    "web.page-set",
+    "chat.qq-sync"
   ],
   "tools": [
     {
@@ -303,6 +304,7 @@
     "test.ts",
     "format-test.ts",
     "regression-test.ts",
-    "approval-test.ts"
+    "approval-test.ts",
+    "chat-sync-test.ts"
   ]
 }
